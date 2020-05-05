@@ -6,14 +6,9 @@ const config = require("./config");
 const fs = require("fs");
 const path = require("path");
 
-const Twitter = new Twit(config);
+const client = new Twit(config);
 
 const neko_endpoint = `https://nekobot.xyz/api/image?type=neko`;
-const twitter_upload_endpoint = `https://upload.twitter.com`;
-
-const multipart_headers = {
-  "Content-Type": `multipart/form-data`,
-};
 
 // To download and save image from url
 const download = async (url, image_path) => {
@@ -29,27 +24,31 @@ const download = async (url, image_path) => {
   });
 };
 
+const removeFile = async (file_path) => {
+  fs.unlinkSync(file_path);
+};
+
+const getBase64File = (file_path) => {
+  return fs.readFileSync(file_path, { encoding: "base64" });
+};
+
 const NekoBotLife = async () => {
   try {
-    // =================================
+    // ========================================================
     // NEKOBOT API
-    // =================================
-    // GET IMAGE DATA FROM NEKO API
+    // ========================================================
 
+    // GET IMAGE DATA FROM NEKO API
     const response = await axios.get(neko_endpoint);
 
-    // =================================
+    // ========================================================
     // IMAGE
-    // =================================
+    // ========================================================
 
     // GET METADATA OF IMAGE
     const {
       data: { message: imageUrl, img_name: imageFilename },
     } = response;
-
-    const imageExt = imageFilename.split(".")[
-      imageFilename.split(".").length - 1
-    ];
 
     const imageName = imageFilename
       .split(".")
@@ -70,20 +69,59 @@ const NekoBotLife = async () => {
     // CONVERT IMAGE TO WEBP
     await sharp(imagePath).toFormat("webp").toFile(imageWebpPath);
 
-    // =================================
+    // ========================================================
     // TWITTER
-    // =================================
+    // ========================================================
 
-    // GENERATE TWITTER MEDIA PARAMETERS
-    const media_category = imageExt === "gif" ? "tweet_gif" : "tweet_image";
+    // GET TWITTER MEDIA RAW FILE
+    const imageData = getBase64File(imageWebpPath);
 
-    // const twitterEndpoint = "";
+    // UPLOAD IMAGE TO TWITTER API
+    const media = await new Promise((resolve, reject) => {
+      client.post(
+        "/media/upload",
+        {
+          media: imageData,
+        },
+        function (error, media, response) {
+          if (error) return reject(error);
 
-    // const teste = await Twitter.post(twitterEndpoint, {
-    //   status: message,
-    // });
+          console.log("check 1");
+          console.log(response);
+          resolve(media);
+        }
+      );
+    });
 
-    console.log("ok");
+    const tweetData = {
+      status: "Tweet with NodeJS",
+      media_ids: media.media_id_string,
+    };
+
+    await new Promise((resolve, reject) => {
+      client.post("statuses/update", tweetData, function (
+        error,
+        tweet,
+        response
+      ) {
+        if (error) {
+          reject(error);
+          console.log(error);
+        } else {
+          console.log("check 2");
+          console.log(tweet);
+          console.log(response);
+          console.log("Successfully tweeted an image!");
+          resolve(tweet);
+        }
+      });
+    });
+
+    // ========================================================
+    // DELETE FILES AFTER UPLOAD TO TWITTER MEDIA API
+    // ========================================================
+    removeFile(imagePath);
+    removeFile(imageWebpPath);
   } catch (error) {
     const date = new Date();
 

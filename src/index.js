@@ -1,26 +1,89 @@
 const Twit = require("twit");
 const axios = require("axios");
+const sharp = require("sharp");
 const config = require("./config");
+
+const fs = require("fs");
+const path = require("path");
 
 const Twitter = new Twit(config);
 
+const neko_endpoint = `https://nekobot.xyz/api/image?type=neko`;
+const twitter_upload_endpoint = `https://upload.twitter.com`;
+
+const multipart_headers = {
+  "Content-Type": `multipart/form-data`,
+};
+
+// To download and save image from url
+const download = async (url, image_path) => {
+  const response = await axios({
+    url,
+    responseType: "stream",
+  });
+  return await new Promise((resolve, reject) => {
+    response.data
+      .pipe(fs.createWriteStream(image_path))
+      .on("finish", () => resolve())
+      .on("error", (e) => reject(e));
+  });
+};
+
 const NekoBotLife = async () => {
   try {
-    const endpoint = "https://nekobot.xyz/api/image?type=neko";
+    // =================================
+    // NEKOBOT API
+    // =================================
+    // GET IMAGE DATA FROM NEKO API
 
-    const response = await axios.get(endpoint);
+    const response = await axios.get(neko_endpoint);
 
+    // =================================
+    // IMAGE
+    // =================================
+
+    // GET METADATA OF IMAGE
     const {
-      data: { img_name: imgName, message, color },
+      data: { message: imageUrl, img_name: imageFilename },
     } = response;
 
-    const twitterEndpoint = "/statuses/update";
+    const imageExt = imageFilename.split(".")[
+      imageFilename.split(".").length - 1
+    ];
 
-    const teste = await Twitter.post(twitterEndpoint, {
-      status: message,
-    });
+    const imageName = imageFilename
+      .split(".")
+      .filter((_, i, all) => i < all.length - 1)
+      .join(".");
 
-    console.log(teste);
+    const imagePath = path.normalize(
+      path.join(__dirname, "temp", imageFilename)
+    );
+
+    const imageWebpPath = path.normalize(
+      path.join(__dirname, "temp", imageName + ".webp")
+    );
+
+    // DOWNLOAD IMAGE
+    await download(imageUrl, imagePath);
+
+    // CONVERT IMAGE TO WEBP
+    await sharp(imagePath).toFormat("webp").toFile(imageWebpPath);
+
+    // =================================
+    // TWITTER
+    // =================================
+
+    // GENERATE TWITTER MEDIA PARAMETERS
+    const media_category = imageExt === "gif" ? "tweet_gif" : "tweet_image";
+
+    // const twitterEndpoint = "";
+
+    // const teste = await Twitter.post(twitterEndpoint, {
+    //   status: message,
+    // });
+
+    console.log("ok");
   } catch (error) {
     const date = new Date();
 

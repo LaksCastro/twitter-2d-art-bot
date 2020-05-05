@@ -8,9 +8,17 @@ const path = require("path");
 
 const client = new Twit(config);
 
-const { createUniqueId } = require("./utils");
+const { random } = require("./utils");
 
-const waifu_endpoint = `https://nekobot.xyz/api/image?type=neko`;
+const available_api_types = [
+  "neko",
+  "hmidriff",
+  "coffee",
+  "kemonomimi",
+  "holo",
+];
+
+const getWaifuEndpoint = (type) => `https://nekobot.xyz/api/image?type=${type}`;
 
 // 1000 miliseconds = 1 second
 // * 60 = 60 seconds = 1 minute
@@ -47,7 +55,11 @@ const WaifuBotLife = async () => {
     // ========================================================
 
     // GET IMAGE DATA FROM NEKO API
-    const response = await axios.get(waifu_endpoint);
+    const response = await axios.get(
+      getWaifuEndpoint(
+        available_api_types[random(0, available_api_types.length - 1)]
+      )
+    );
 
     // ========================================================
     // IMAGE
@@ -85,11 +97,7 @@ const WaifuBotLife = async () => {
     const imageData = getBase64File(imageWebpPath);
 
     // UPLOAD IMAGE TO TWITTER API
-    client.post("media/upload", { media: imageData }, function (
-      error,
-      media,
-      response
-    ) {
+    client.post("media/upload", { media: imageData }, function (error, media) {
       if (error) {
         console.log(error);
       } else {
@@ -100,11 +108,7 @@ const WaifuBotLife = async () => {
 
         client.get("media/upload");
 
-        client.post("statuses/update", status, function (
-          error,
-          tweet,
-          response
-        ) {
+        client.post("statuses/update", status, function (error, tweet) {
           if (error) {
             console.log(error);
           } else {

@@ -40,7 +40,7 @@ const TwitterReplyFactory = () => {
       } = await ImageApi.get();
 
       imagePath = imgPath;
-      imgWebPath = imgWebPath;
+      imageWebpPath = imgWebPath;
 
       Console.write("3. Converting image to webp...");
       await Converter.convert(imagePath, imageWebpPath, "webp");
@@ -62,6 +62,12 @@ const TwitterReplyFactory = () => {
 
       Console.error(datelog);
       Console.error(error);
+
+      Console.error("An error ocurred...");
+      Console.write("Trying again...");
+
+      // Try again in 30 seconds...
+      setTimeout(() => send(getStatus, onComplete), 1000 * 10);
     } finally {
       FileManager.del(imagePath);
       FileManager.del(imageWebpPath);

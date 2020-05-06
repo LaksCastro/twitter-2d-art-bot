@@ -1,13 +1,15 @@
 // ===========================================================================================
 // This is a Entrypoint, all bot work with the imported modules here
 // ===========================================================================================
-const Twit = require("twit");
-const config = require("./config");
+(async function EntryPoint() {
+  const TwitterClient = require("./client/twitter");
+  await TwitterClient.initialize();
 
-const Client = require("./client");
-Client.set(new Twit(config));
+  const PixivClient = require("./client/pixiv");
+  await PixivClient.initialize();
 
-const BotFactory = require("./bot");
-const Bot = BotFactory();
+  const BotFactory = require("./bot");
+  const Bot = BotFactory();
 
-Bot.initialize();
+  Bot.initialize();
+})();

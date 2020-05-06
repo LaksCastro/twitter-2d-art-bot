@@ -3,12 +3,15 @@ const path = require("path");
 const { random } = require("../utils");
 
 const NekoBotApiFactory = () => {
+  const { DownloadFactory } = require("./index");
+  const Download = DownloadFactory();
+
   let nekoBotTypes = ["neko", "hmidriff", "coffee", "kemonomimi", "holo"];
 
   let getNekoBotEndpoint = (type) =>
     `https://nekobot.xyz/api/image?type=${type}`;
 
-  const generateResult = (response) => {
+  const generateResult = async (response) => {
     const {
       data: { message: imageUrl, img_name: imageFilename },
     } = response;
@@ -25,6 +28,8 @@ const NekoBotApiFactory = () => {
     const imageWebpPath = path.normalize(
       path.join(__dirname, "..", "temp", imageName + ".webp")
     );
+
+    await Download.request(imageUrl, imagePath);
 
     const result = {
       imageUrl,
@@ -50,13 +55,12 @@ const NekoBotApiFactory = () => {
 
     const response = await axios.get(endpoint);
 
-    const result = generateResult(response);
-
-    return result;
+    return response;
   };
 
   const public = {
     get,
+    generateResult,
   };
 
   return Object.freeze(public);

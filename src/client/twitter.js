@@ -1,20 +1,24 @@
 // ===========================================================================================
-// Factory that manage Twitter Client instance, accept only the first set() call,
-// For to block change more 1 time the Client Instance
+// Factory that manage Twitter Client instance
 // ===========================================================================================
-const ClientInstanceFactory = () => {
+
+const Twit = require("twit");
+const { TwitterConfig } = require("../config");
+
+const TwitterClientInstanceFactory = () => {
   let client = null;
 
-  const set = (clientInstance) => {
-    if (client) throw new Error("A Client Instance Is Already Declared");
+  const initialize = async () => {
+    if (client)
+      throw new Error("A Twitter Client Instance Is Already Declared");
 
-    client = clientInstance;
+    client = new Twit(TwitterConfig);
   };
 
   const get = () => client;
 
   const public = {
-    set,
+    initialize,
     get,
   };
 
@@ -24,6 +28,6 @@ const ClientInstanceFactory = () => {
 // ===========================================================================================
 // Create a void Client Instance, she will to be used by all application
 // ===========================================================================================
-const ClientInstance = ClientInstanceFactory();
+const TwitterClientInstance = TwitterClientInstanceFactory();
 
-module.exports = ClientInstance;
+module.exports = TwitterClientInstance;

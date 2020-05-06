@@ -1,4 +1,4 @@
-const { get } = require("../client");
+const { get } = require("../client/twitter");
 
 const TwitterApiFactory = () => {
   let client = null;

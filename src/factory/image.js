@@ -4,8 +4,7 @@ const ImageApiFactory = () => {
   const { NekoBotApiFactory, PixivApiFactory } = require("./index");
 
   // const availableApis = [NekoBotApiFactory, PixivApiFactory];
-  // const availableApis = [PixivApiFactory];
-  const availableApis = [NekoBotApiFactory];
+  const availableApis = [PixivApiFactory];
 
   // ===========================================================================================
   // This function is a Wrapper for execute the following steps:
@@ -26,7 +25,11 @@ const ImageApiFactory = () => {
 
     const Api = Factory();
 
-    const result = await Api.get();
+    const response = await Api.get();
+
+    console.log("2. Downloading Image...");
+
+    const result = await Api.generateResult(response);
 
     return result;
   };

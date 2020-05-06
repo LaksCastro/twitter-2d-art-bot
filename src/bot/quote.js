@@ -1,6 +1,6 @@
 const { TwitterReplyFactory } = require("../factory");
 
-const { get } = require("../client");
+const { get } = require("../client/twitter");
 
 const AutomaticReplyFactory = () => {
   const TwitterReply = TwitterReplyFactory();
@@ -15,14 +15,22 @@ const AutomaticReplyFactory = () => {
   const onUserQuoteBot = (tweet) => {
     const { user, id_str } = tweet;
 
-    TwitterReply.send(
-      (media) => ({
-        status: `@${user.name} #StayAtHome`,
-        media_ids: media.media_id_string,
-        in_reply_to_status_id: id_str,
-      }),
-      () => console.log("Successfully reply to user: " + user.name)
-    );
+    console.log("\x1b[36m%s\x1b[0m", "Starting reply generation...");
+
+    const whenTaskEnds = () => {
+      console.log(
+        "\x1b[36m%s\x1b[0m",
+        "Successfully reply to user: " + user.name
+      );
+    };
+
+    const getStatus = (media) => ({
+      status: `@${user.name} #StayAtHome`,
+      media_ids: media.media_id_string,
+      in_reply_to_status_id: id_str,
+    });
+
+    TwitterReply.send(getStatus, whenTaskEnds);
   };
 
   // ===========================================================================================

@@ -14,8 +14,10 @@ const AutomaticTweetFactory = () => {
   // And when task ends, this set another setTimeout to call sheself, making a infinite loop
   // ===========================================================================================
   const loop = () => {
+    console.log("\x1b[32m", "Starting tweet generation...");
+
     const whenTaskEnds = () => {
-      console.log("Successfully tweeted an image!");
+      console.log("\x1b[32m", "Complete! Tweet was sent...");
       loopId = setTimeout(loop, timeInterval);
     };
 

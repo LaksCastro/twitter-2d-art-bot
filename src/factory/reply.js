@@ -1,14 +1,12 @@
 const TwitterReplyFactory = () => {
   const {
     TwitterApiFactory,
-    DownloadFactory,
     ImageApiFactory,
     ConverterFactory,
     FileManagerFactory,
   } = require("./index");
 
   const ImageApi = ImageApiFactory();
-  const Download = DownloadFactory();
   const Converter = ConverterFactory();
   const FileManager = FileManagerFactory();
   const TwitterApi = TwitterApiFactory();
@@ -29,17 +27,22 @@ const TwitterReplyFactory = () => {
       throw new Error("Function to get tweet status is necessary");
 
     try {
-      const { imageUrl, imagePath, imageWebpPath } = await ImageApi.get();
+      console.log("\x1b[0m", "1. Fetching image from API's...");
 
-      await Download.request(imageUrl, imagePath);
+      const { imagePath, imageWebpPath } = await ImageApi.get();
+
+      console.log("3. Converting image to webp...");
       await Converter.convert(imagePath, imageWebpPath, "webp");
 
       const imageData = FileManager.getBase64(imageWebpPath);
 
+      console.log("4. The request was sent to the Twitter server");
       TwitterApi.requestReply(imageData, getStatus, onComplete);
 
       FileManager.del(imagePath);
       FileManager.del(imageWebpPath);
+
+      onComplete();
     } catch (error) {
       const date = new Date();
 
@@ -50,8 +53,6 @@ const TwitterReplyFactory = () => {
 
       console.log(datelog);
       console.log(error);
-    } finally {
-      onComplete();
     }
   };
 

@@ -22,6 +22,25 @@ const NekoBotApiFactory = () => {
   let maxTry = 30;
   let currentTry = 0;
 
+  // ===========================================================================================
+  // Function to manage image fetched in get() method, she will do:
+  // - Generate imageId, imageName, imagePath, etc.
+  // - To download image
+  // - Return default data format
+  // ===========================================================================================
+  // - Data format:
+  // {
+  //   "imageUrl": String
+  //   "imageFilename": String
+  //   "imagePath": String
+  //   "imageWebpPath": String
+  //   "imageName": String
+  //   "imageId": String
+  //   "imageAuthor": String
+  //   "source": String
+  //   "availableIn": String
+  // }
+  // ===========================================================================================
   const generateResult = async (response) => {
     const {
       data: { message: imageUrl, img_name: imageFilename },

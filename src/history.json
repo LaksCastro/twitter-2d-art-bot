@@ -1,7 +1,1 @@
-{
-    "state": {
-        "pixiv_api": {},
-        "nekobot_api": {}
-    },
-    "history": []
-}
+{"state":{"pixiv_api":{},"nekobot_api":{}},"history":[{"imageUrl":"https://nekobot.xyz/kemonomimi/neko_v2_426.jpg","imageFilename":"neko_v2_426.jpg","imagePath":"C:\\Users\\castr\\Desktop\\twitter-neko-bot\\src\\temp\\neko_v2_426.jpg","imageWebpPath":"C:\\Users\\castr\\Desktop\\twitter-neko-bot\\src\\temp\\neko_v2_426.webp","imageName":"neko_v2_426","imageId":"neko__bot--https://nekobot.xyz/kemonomimi/neko_v2_426.jpg","imageAuthor":null,"source":"nekobot_api","availableIn":"https://nekobot.xyz/kemonomimi/neko_v2_426.jpg","date":"Thu May 07 2020 10:58:31 GMT-0300 (GMT-03:00)"}]}

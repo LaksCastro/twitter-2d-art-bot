@@ -18,7 +18,9 @@ const TwitterApiFactory = () => {
 
     client.post("media/upload", { media: base64 }, function (error, media) {
       if (error) {
+        Console.error("Twitter API error on upload image...");
         Console.error(error);
+        throw error;
       } else {
         let tweet = getStatus(media);
 
@@ -27,7 +29,11 @@ const TwitterApiFactory = () => {
         else tweet.status = `${tweet.status}\nAvailable in ${availableIn}`;
 
         client.post("statuses/update", tweet, function (error) {
-          if (error) return Console.error(error);
+          if (error) {
+            Console.error("Twitter API error on upload tweet...");
+            Console.error(error);
+            throw error;
+          }
 
           onComplete(media);
         });
